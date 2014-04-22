@@ -1,20 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 )
 
 func main() {
-	http.HandleFunc("/", hello)
-	fmt.Println("listening...")
+	fs := http.FileServer(http.Dir("static"))
+	http.Handle("/", fs)
+
 	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	if err != nil {
 		panic(err)
 	}
-}
 
-func hello(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintln(res, "hello, world")
 }
