@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Radegast</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular.min.js" type="text/javascript"></script>
+    <script src="radegast.js" type="text/javascript"></script>
+    <script src="lib/mm-foundation-tpls-0.1.0.js"></script>
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/foundation/5.2.2/css/foundation.min.css" rel="stylesheet"/>
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.min.css" rel="stylesheet" />
+
+
+
+</head>
+<body>
+<div>
+    <nav class="top-bar">
+        <ul class="title-area">
+            <li class="name">
+                <h1>
+                    <a href="index.html">Radegast</a>
+                </h1>
+            </li>
+        </ul>
+        <section class="top-bar-section">
+            <ul class="left">
+                <li class="has-dropdown">
+                    <a class="ng-isolate-scope" dropdown-toggle="#sections-list">Sections</a>
+
+                    <ul id="sections-list" class="dropdown" style="display: none; left: 0px; top: 45px;"></ul>
+                </li>
+            </ul>
+        </section>
+    </nav>
+</div>
+<div ng-app="Radegast" role="main">
+
+<div class="container">
+
+
+    <div class="row">
+        <div >
+            <h2>Recipe Overview</h2>
+            <form>
+                <div class="row">
+                    <div class="medium-3 columns">
+                        <label>Recipe Name</label>
+                    </div>
+                    <div class="medium-9 columns">
+                        <input type="text" ng-model="recipe.name">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="medium-3 columns">
+                        <label>Brewer</label>
+                    </div>
+                    <div class="medium-9 columns">
+                        <input type="text" ng-model="recipe.brewer">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-3 columns">
+                        <label>Recipe Name</label>
+                    </div>
+                    <div class="medium-9 columns">
+                        <input type="text" ng-model="recipe.style">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-3 columns">
+                        <label>Expected Original Gravity</label>
+                    </div>
+                    <div class="medium-9 columns">
+                        <input type="text" ng-model="recipe.expectedOriginalGravity" disabled/>
+                        <!--{{recipe.expectedOriginalGravity}}-->
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-3 columns">
+                        <label>IBU (Tins)</label>
+                    </div>
+                    <div class="medium-9 columns">
+                        <input type="text" ng-model="recipe.ib" disabled/>
+                        <!--{{recipe.ibu}}-->
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-3 columns">
+                        <label>ABV</label>
+                    </div>
+                    <div class="medium-8 columns">
+                        <input type="text" ng-model="recipe.abv" disabled/>
+                        <!--{{recipe.abv}}-->
+                    </div>
+                    <div class="medium-1 columns">
+                        <label class="inline">%</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-3 columns">
+                        <label>Bitterness to Gravity Ratio</label>
+                    </div>
+                    <div class="medium-9 columns">
+                        <input type="text" ng-model="recipe.bitternessGravityRatio" disabled/>
+                        <!--{{recipe.bitternessGravityRatio}}-->
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-3 columns">
+                        <label>Color (EBC)</label>
+                    </div>
+                    <div class="medium-9 columns">
+                        <input type="text" ng-model="recipe.color" disabled/>
+                        <!--{{recipe.color}}-->
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-3 columns">
+                        <label>Final Gravity</label>
+                    </div>
+                    <div class="medium-9 columns">
+                        <input type="text" ng-model="recipe.finalGravity" disabled/>
+                        <!--{{recipe.finalGravity}}-->
+                    </div>
+                </div>
+
+                <!--TODO link to shop-->
+
+            </form>
+        </div>
+
+        <div ng-controller="EquipmentController">
+            <h2>Equipment</h2>
+
+            <form>
+                <div class="row">
+                    <div class="medium-3 columns">
+                        <label>Diameter</label>
+                    </div>
+                    <div class="medium-8 columns">
+                        <input type="number" ng-model="kettle.diameter">
+                    </div>
+                    <div class="medium-1 columns">
+                        <label class="inline">cm</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-3 columns">
+                        <label>Height</label>
+                    </div>
+                    <div class="medium-8 columns">
+                        <input type="number" ng-model="kettle.height">
+                    </div>
+                    <div class="medium-1 columns">
+                        <label class="inline">cm</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-3 columns">
+                        <label>Kettle Capacity</label>
+                    </div>
+                    <div class="medium-8 columns">
+                        {{volume() | number:1}}
+                    </div>
+                    <div class="medium-1 columns">
+                        <label class="inline">L</label>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+
+        <div ng-controller="GrainBillController">
+            <h2>Grain Bill</h2>
+            <form>
+                <div class="row">
+                    <div class="small-4 columns">
+                        <label>This recipe requires an Original Gravity (OG) of:</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="grain.og">
+                    </div>
+                    <div class="small-4 columns">
+                        <label>For this batch though, I'd like to try an OG of:</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="grain.og">
+                    </div>
+                </div>
+
+                <div ng-repeat="grain in grainbill.grains"></div>
+
+
+                <a href="#" class="button step fi-plus size-24"> Add Grain</a>
+
+            </form>
+        </div>
+
+        <div ng-controller="HopBillController">
+            <h2>Hop Bill</h2>
+            <form>
+                <div class="row">
+                    <div class="small-8 columns">
+                        <label>I'm copying this recipe from an external source. The original recipe's Volume of Ambient Wort (VAW) was: </label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="grain.og">
+                    </div>
+                    <div class="medium-2 columns">
+                        <label class="inline">L</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="small-8 columns">
+                        <label>I'm designing my own recipe or wish to change the original recipe's bitteress. Pleause juset set my Desired IBU's to:</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="grain.og">
+                    </div>
+                    <div class="medium-2 columns">
+                        <label class="inline">Tinseth</label>
+                    </div>
+                </div>
+
+                <div ng-repeat="hop in hops"></div>
+
+
+                <a href="#" class="button step fi-plus size-24"> Add Hop</a>
+
+            </form>
+        </div>
+
+        <div ng-controller="MiscellaneousController">
+            <h2>Miscellaneous</h2>
+            <form>
+
+                <div ng-repeat="hop in hops"></div>
+
+
+                <a href="#" class="button step fi-plus size-24"> Add Hop</a>
+
+            </form>
+        </div>
+
+        <div ng-controller="MashController">
+            <h2>Mashing Instructions</h2>
+            <form>
+                <div class="row">
+                    <div class="medium-4 columns">
+                        <label>Pure BIAB (Full-Volume Mash)</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="mash.time">
+                    </div>
+                    <div class="medium-2 columns">
+                        <label>mins at</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="mash.temp">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-4 columns">
+                        <label>If grain is </label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="mash.grainTemp">
+                    </div>
+                    <div class="medium-2 columns">
+                        <label>then strike at </label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="mash.strikeTemp" disabled>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div ng-controller="VolumeController">
+            <h2>Estimated Volumes</h2>
+
+            <form>
+                <div class="row">
+                    <div class="medium-9 columns">
+                        <label>Total Water Needed (TWN):</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="totalWaterNeeded" disabled>
+                    </div>
+                    <div class="medium-1 columns inline">
+                        <label>Litres</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-9 columns">
+                        <label>[Hot] Strike Water Needed (SWN):</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="strikeWaterNeeded" disabled>
+                    </div>
+                    <div class="medium-1 columns inline">
+                        <label>Litres</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-9 columns">
+                        <label>Mash Volume:</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="mashVolume" disabled>
+                    </div>
+                    <div class="medium-1 columns inline">
+                        <label>Litres</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-9 columns">
+                        <label>Volume into Boil(VIB)</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="volumeIntoBoil" disabled>
+                    </div>
+                    <div class="medium-1 columns inline">
+                        <label>Litres</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-9 columns">
+                        <label>Evaporation:</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="evaporation" disabled>
+                    </div>
+                    <div class="medium-1 columns inline">
+                        <label>Litres</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-9 columns">
+                        <label>Volume at Flame-Out (VFO):</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="volumeAtFlameOut" disabled>
+                    </div>
+                    <div class="medium-1 columns inline">
+                        <label>Litres</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-9 columns">
+                        <label>Volume of Ambient Wort (VAW):</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="volumeOfAmbientWort" disabled>
+                    </div>
+                    <div class="medium-1 columns inline">
+                        <label>Litres</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-9 columns">
+                        <label>Kettle to Fermentor Loss (KFL):</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="kettleToFermentorLoss" disabled>
+                    </div>
+                    <div class="medium-1 columns inline">
+                        <label>Litres</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-9 columns">
+                        <label>Volume into Fermentor:</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="volumeIntoFermentor" disabled>
+                    </div>
+                    <div class="medium-1 columns inline">
+                        <label>Litres</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-9 columns">
+                        <label>Fermentor to Packaging Loss (FPL):</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="fermentorToPackagingLoss" disabled>
+                    </div>
+                    <div class="medium-1 columns inline">
+                        <label>Litres</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="medium-9 columns">
+                        <label>Volume into Packaging:</label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <input type="number" ng-model="volumeIntoPackaging" disabled>
+                    </div>
+                    <div class="medium-1 columns inline">
+                        <label>Litres</label>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+    </div>
+</div>
+
+
+</div>
+
+</body>
+</html>
