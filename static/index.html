@@ -228,7 +228,7 @@
                         </tr>
                     </table>
                 </div>
-                <button ng-click="addGrain()" class="button fi-plus size-18"> Add Grain</button>
+                <a ng-click="addGrain()" class="button fi-plus size-18"> Add Grain</a>
 
             </form>
         </div>
@@ -268,10 +268,11 @@
                             <th>Alpha Acid</th>
                             <th>Mins</th>
                             <th>Grams</th>
+                            <th></th>
                         </tr>
                         <tr data-ng-repeat="hop in hops">
                             <td>
-                                <input type="text" ng-model="hop">
+                                <input type="text" ng-model="hop.name">
                             </td>
                             <td>
                                 <input type="text" ng-model="hop.form">
@@ -285,12 +286,15 @@
                             <td>
                                 <input type="text" ng-model="grain.grams" disabled>
                             </td>
+                            <td>
+                                <a ng-click="removeHop(hop)" class="button fi-minus" ></a>
+                            </td>
                         </tr>
                     </table>
                 </div>
 
 
-                <button class="button step fi-plus size-24"> Add Hop</button>
+                <a ng-click="addHop()" class="button step fi-plus size-24"> Add Hop</a>
 
             </form>
         </div>
@@ -307,29 +311,32 @@
                             <th>Stage</th>
                             <th>Mins</th>
                             <th>Reason</th>
+                            <th></th>
                         </tr>
-                        <tr data-ng-repeat="ingredient in miscellaneous">
+                        <tr data-ng-repeat="item in items">
                             <td>
-                                <input type="text" ng-model="ingredient.name">
+                                <input type="text" ng-model="item.name">
                             </td>
                             <td>
-                                <input type="text" ng-model="ingredient.amount">
+                                <input type="text" ng-model="item.amount">
                             </td>
                             <td>
-                                <input type="text" ng-model="ingredient.stage" disabled>
+                                <input type="text" ng-model="item.stage" disabled>
                             </td>
                             <td>
-                                <input type="text" ng-model="ingredient.mins">
+                                <input type="text" ng-model="item.mins">
                             </td>
                             <td>
-                                <input type="text" ng-model="ingredient.reason" disabled>
+                                <input type="text" ng-model="item.reason" disabled>
+                            </td>
+                            <td>
+                                <a ng-click="removeItem(item)" class="button fi-minus" ></a>
                             </td>
                         </tr>
                     </table>
                 </div>
 
-
-                <a href="#" class="button step fi-plus size-24"> Add Ingredient</a>
+                <a ng-click="addItem()" class="button step fi-plus"> Add Item</a>
 
             </form>
         </div>

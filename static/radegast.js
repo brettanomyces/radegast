@@ -20,12 +20,72 @@ function GrainBillController($scope){
 
 
     $scope.addGrain = function () {
-        $scope.grains.push({name: "", ebc: undefined, grams : undefined});
-    }
+        $scope.grains.push({
+            name: undefined,
+            ebc: undefined,
+            grams : undefined
+        });
+    };
 
     $scope.removeGrain = function(grain) {
         var index=$scope.grains.indexOf(grain);
         $scope.grains.splice(index,1);
+    }
+}
+
+function HopBillController($scope){
+
+    $scope.hops = [{
+        name: undefined,
+        form: undefined,
+        method: undefined,
+        alphaAcid: undefined,
+        minutes: undefined,
+        grams : undefined
+    }];
+
+
+    $scope.addHop = function () {
+        $scope.hops.push({
+            name: undefined,
+            form: undefined,
+            method: undefined,
+            alphaAcid: undefined,
+            minutes: undefined,
+            grams : undefined
+        });
+    };
+
+    $scope.removeHop = function(hop) {
+        var index=$scope.hops.indexOf(hop);
+        $scope.hops.splice(index,1);
+    }
+}
+
+function MiscellaneousController($scope){
+
+    $scope.items = [{
+        name: undefined,
+        amount: undefined,
+        stage: undefined,
+        minutes: undefined,
+        reason : undefined
+    }];
+
+
+    $scope.addItem = function () {
+        $scope.items.push({
+            name: undefined,
+            amount: undefined,
+            stage: undefined,
+            minutes: undefined,
+            reason : undefined
+        });
+    };
+
+    $scope.removeItem = function(item) {
+        var index=$scope.hops.indexOf(item);
+        $scope.items.splice(index,1);
     }
 }
 
