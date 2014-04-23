@@ -13,32 +13,20 @@ app.factory('Equipment', function() {
    }
 });
 
-app.factory('GrainBill', function() {
-    return {
-        requiredOg : undefined,
-        grains : [{
-            name: undefined,
-            ebc: undefined,
-            grams: undefined
-        }]
-    }
-
-});
-
-function GrainBillController($scope, GrainBill){
+function GrainBillController($scope){
 
     $scope.requiredOg = undefined;
-    $scope.grains = ["Caramalt", "T2", "Chocolate"];
+    $scope.grains = [{name: "", ebc: undefined, grams : undefined}];
 
 
     $scope.addGrain = function () {
-        $scope.grains.push("test");
+        $scope.grains.push({name: "", ebc: undefined, grams : undefined});
     }
 
-    $scope.removeGrain = function(num) {
-        $scope.grains.remove(num);
+    $scope.removeGrain = function(grain) {
+        var index=$scope.grains.indexOf(grain);
+        $scope.grains.splice(index,1);
     }
-
 }
 
 function EquipmentController($scope, Equipment) {

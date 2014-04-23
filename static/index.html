@@ -204,10 +204,11 @@
                             <th>SRM</th>
                             <th>Grams/Ratio</th>
                             <th>%</th>
+                            <th></th>
                         </tr>
                         <tr data-ng-repeat="grain in grains">
                             <td>
-                                <input type="text" ng-model="grain">
+                                <input type="text" ng-model="grain.name">
                             </td>
                             <td>
                                 <input type="text" ng-model="grain.ebc">
@@ -221,10 +222,13 @@
                             <td>
                                 <input type="text" ng-model="grain.percent" disabled>
                             </td>
+                            <td>
+                                <a ng-click="removeGrain(grain)" class="button fi-minus" ></a>
+                            </td>
                         </tr>
                     </table>
                 </div>
-                <a href="#" class="button step fi-plus size-18"> Add Grain</a>
+                <button ng-click="addGrain()" class="button fi-plus size-18"> Add Grain</button>
 
             </form>
         </div>
@@ -286,7 +290,7 @@
                 </div>
 
 
-                <a href="#" class="button step fi-plus size-24"> Add Hop</a>
+                <button class="button step fi-plus size-24"> Add Hop</button>
 
             </form>
         </div>
