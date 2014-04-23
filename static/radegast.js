@@ -112,3 +112,19 @@ function cylinderVolume(diameter, height){
 function cmCubedToLitres(cmCubed){
     return cmCubed / 1000;
 }
+
+function ibu(utilization, alphaAcid, grams, litres, correction){
+    return (utilization * alphaAcid * grams) / (litres * correction) * 1000
+}
+
+function ibuCorrection(gravityOfBoil){
+    if (gravityOfBoil <= 1.050){
+        return 1;
+    } else {
+        return 1 + (gravityOfBoil - 1.050) / 0.2;
+    }
+}
+
+function alcoholByVolume(originalGravity, terminalGravity){
+    return (originalGravity - terminalGravity) / 0.75;
+}
