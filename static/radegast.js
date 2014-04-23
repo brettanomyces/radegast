@@ -6,7 +6,6 @@ var app = angular.module('Radegast', [
     'mm.foundation'
 ]);
 
-// Create a service called 'Volume'
 app.factory('Equipment', function() {
    return {
        kettleHeight : undefined,
@@ -17,7 +16,6 @@ app.factory('Equipment', function() {
 app.factory('GrainBill', function() {
     return {
         requiredOg : undefined,
-        experimentalOg : undefined,
         grains : [{
             name: undefined,
             ebc: undefined,
@@ -29,14 +27,16 @@ app.factory('GrainBill', function() {
 
 function GrainBillController($scope, GrainBill){
 
-    $scope.grainBill = GrainBill;
+    $scope.requiredOg = undefined;
+    $scope.grains = ["Caramalt", "T2", "Chocolate"];
+
 
     $scope.addGrain = function () {
-        $scope.grainBill.grains.push();
+        $scope.grains.push("test");
     }
 
     $scope.removeGrain = function(num) {
-        $scope.grainBill.grains.remove(num);
+        $scope.grains.remove(num);
     }
 
 }
