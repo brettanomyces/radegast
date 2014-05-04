@@ -128,3 +128,118 @@ function ibuCorrection(gravityOfBoil){
 function alcoholByVolume(originalGravity, terminalGravity){
     return (originalGravity - terminalGravity) / 0.75;
 }
+
+// BH79 = totalGrainWeight
+// CQ27 = totalWaterNeeded
+// CQ30 = strikeWaterNeeded
+// CQ36 = volumeIntoBoil
+// EA64 = waterHeldBackFromMash
+// EA67 = waterUsedInASparge
+// EA73 = waterAddedBeforeBoil
+// EA76 = waterAddedDuringBoil
+// EA79 = waterAddedToFermenter
+// EB104 = volumeLostFromLauterAdjustment l/kg
+
+/**
+ *
+ * @param totalGrainWeight (grams)
+ * @param volumeIntoBoil (litres)
+ * @param waterAddedDuringBoil (litres)
+ * @param waterAddedToFermenter (litres)
+ * @param volumeLostFromLauterAdjustment (litres/kilogram)
+ */
+function totalWaterNeeded(totalGrainWeight, volumeIntoBoil, waterAddedDuringBoil, waterAddedToFermenter, volumeLostFromLauterAdjustment) {
+    // =IF(AND(ISNUMBER(BH79),ISNUMBER(B:DF)),IF(EB104>0,(EB104*BH79/1000)+CQ36*0.9614+EA76+EA79,(0.628*BH79/1000)+CQ36*0.9614+EA76+EA79),"")
+
+
+    if (totalGrainWeight !== null && volumeIntoBoil !== null){
+        if (volumeLostFromLauterAdjustment !== null){
+            return (volumeLostFromLauterAdjustment*totalGrainWeight/1000)+(volumeIntoBoil*0.9614)+waterAddedDuringBoil+waterAddedToFermenter;
+        } else {
+            return (0.628*totalGrainWeight/1000)+(volumeIntoBoil*0.9614)+waterAddedDuringBoil+waterAddedToFermenter;
+
+        }
+    } else {
+        return null;
+    }
+}
+
+function getStrikeWaterTempAdjustmentFactor() {
+    if (strikeWaterTempAdjustmentFactor !== null ){
+        return strikeWaterTempAdjustmentFactor;
+    } else {
+        return 0.41
+    }
+}
+
+/**
+ *
+ * @param grainTemperature (celsius)
+ * @param mashTemp (celsius)
+ * @param totalGrainWeight (grams)
+ * @param totalWaterNeeded (litres)
+ * @param waterHeldBackFromMash (litres)
+ * @returns {*}
+ */
+function strikeTemperature(grainTemperature, mashTemp, totalGrainWeight, totalWaterNeeded, waterHeldBackFromMash) {
+
+    if (totalWaterNeeded !== null && totalGrainWeight !== null && mashTemp !== null && grainTemperature !== null) {
+        if (waterHeldBackFromMash !== null) {
+            return (getStrikeWaterTempAdjustmentFactor() / ((totalWaterNeeded - waterHeldBackFromMash) / (totalGrainWeight / 1000))) * (mashTemp - grainTemperature) + mashTemp;
+
+        } else {
+            return (getStrikeWaterTempAdjustmentFactor() / (totalWaterNeeded / (totalGrainWeight / 1000))) * (mashTemp - grainTemperature) + mashTemp;
+
+        }
+    } else {
+        return null
+    }
+}
+
+/**
+ *
+ * @param totalWaterNeeded (litres)
+ * @param waterHeldBackFromMash (litres)
+ * @returns {*}
+ */
+function strikeWaterNeeded(totalWaterNeeded, waterHeldBackFromMash) {
+    // =IF(AND(ISNUMBER(CQ27),ISNUMBER(EA64)),(CQ27-EA64)*1.019794,IF(ISNUMBER(CQ27),CQ27*1.019794,""))
+
+    if (totalWaterNeeded !== null)
+        if (waterHeldBackFromMash != null) {
+            return (totalWaterNeeded - waterHeldBackFromMash) * 1.019794;
+        } else {
+            return totalWaterNeeded * 1.019794;
+        } else {
+        return null;
+    }
+}
+
+/**
+ *
+ * @param totalWaterNeeded
+ * @param totalGrainWeight
+ * @param strikeWaterNeeded
+ * @param waterHeldBackFromMash
+ * @param waterUsedInASparge
+ * @param waterAddedBeforeBoil
+ * @param waterAddedDuringBoil
+ * @param waterAddedToFermenter
+ * @returns {*}
+ */
+function mashVolume(totalWaterNeeded, totalGrainWeight, strikeWaterNeeded, waterHeldBackFromMash, waterUsedInASparge, waterAddedBeforeBoil, waterAddedDuringBoil, waterAddedToFermenter){
+
+    if (totalGrainWeight !== null) {
+        if (totalWaterNeeded !== null && waterHeldBackFromMash != null){
+            return ((totalWaterNeeded-waterUsedInASparge-waterAddedBeforeBoil-waterAddedDuringBoil-waterAddedToFermenter)*1.019794)+(totalGrainWeight/1000*0.75);
+        } else if (strikeWaterNeeded !== null){
+            return strikeWaterNeeded+(totalGrainWeight/1000*0.75);
+        }
+    } else {
+        return null;
+    }
+}
+
+function volumeIntoBoil(){
+    // =IF(AND(ISNUMBER(CQ39),ISNUMBER(CQ42)),CQ42+CQ39-EA76/0.9614,"")
+}
