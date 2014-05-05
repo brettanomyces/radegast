@@ -6,11 +6,45 @@ var app = angular.module('Radegast', [
     'mm.foundation'
 ]);
 
-app.factory('Equipment', function() {
-   return {
-       kettleHeight : undefined,
-       kettleDiameter : undefined
-   }
+app.factory('BeerFactory', function () {
+
+    var service = {};
+
+    var kettleHeight;
+    var kettleDiameter;
+
+
+    service.setKettleHeight = function (height) {
+        kettleHeight = height;
+    };
+
+    service.setKettleDiameter = function (diameter) {
+        kettleDiameter = diameter;
+    };
+
+    service.kettleVolume = function () {
+        return cmCubedToLitres(cylinderVolume(kettleHeight, kettleDiameter));
+    };
+
+    return service;
+});
+
+app.controller('BeerController', function($scope, BeerFactory) {
+
+    $scope.kettleHeight = null;
+    $scope.kettleDiameter = null;
+
+    $scope.$watch('kettleHeight', function(newValue){
+        BeerFactory.setKettleHeight(newValue);
+    });
+
+    $scope.$watch('kettleDiameter', function(newValue){
+        BeerFactory.setKettleDiameter(newValue);
+    });
+
+    $scope.kettleVolume = function(){
+        return BeerFactory.kettleVolume();
+    }
 });
 
 function GrainBillController($scope){
@@ -89,20 +123,6 @@ function MiscellaneousController($scope){
     }
 }
 
-function EquipmentController($scope, Equipment) {
-
-    $scope.equipment = Equipment;
-
-    $scope.volume = function(){
-
-        if($scope.equipment.kettleHeight > 0 && $scope.equipment.kettleDiameter > 0 ){
-            return cmCubedToLitres(cylinderVolume($scope.equipment.kettleDiameter, $scope.equipment.kettleHeight));
-        } else {
-            return "";
-        }
-    }
-}
-
 function cylinderVolume(diameter, height){
     // console.log("Diameter: " + diameter + ", Height: " + height);
     var radius = diameter / 2;
@@ -129,7 +149,9 @@ function alcoholByVolume(originalGravity, terminalGravity){
     return (originalGravity - terminalGravity) / 0.75;
 }
 
+// AV27 = kettleDiameter
 // BH79 = totalGrainWeight
+// BP33 = boilDuration
 // CQ27 = totalWaterNeeded
 // CQ30 = strikeWaterNeeded
 // CQ36 = volumeIntoBoil
@@ -139,6 +161,7 @@ function alcoholByVolume(originalGravity, terminalGravity){
 // EA76 = waterAddedDuringBoil
 // EA79 = waterAddedToFermenter
 // EB104 = volumeLostFromLauterAdjustment l/kg
+// DY92 = evaporationRateAdjustment l/hour
 
 /**
  *
@@ -242,4 +265,20 @@ function mashVolume(totalWaterNeeded, totalGrainWeight, strikeWaterNeeded, water
 
 function volumeIntoBoil(){
     // =IF(AND(ISNUMBER(CQ39),ISNUMBER(CQ42)),CQ42+CQ39-EA76/0.9614,"")
+}
+
+
+function evaporation(boilDuration, evaporationRateAdjustment, kettleDiameter) {
+    // =IF(ISNUMBER(DY92),DY92/60*BP33,IF(AND(ISNUMBER(AV27),ISNUMBER(BP33)),(PI()*(AV27/2)*(AV27/2)*0.00428/60*BP33),""))
+
+    if ( boilDuration !== null ) {
+        if (evaporationRateAdjustment !== null){
+            return evaporationRateAdjustment/60*boilDuration;
+        } else if (kettleDiameter !== null ){
+            return (Math.Pi*(kettleDiameter/2)*(kettleDiameter/2)*0.00428/60*boilDuration);
+        }
+
+    } else {
+        return null;
+    }
 }
