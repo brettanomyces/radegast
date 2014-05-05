@@ -13,6 +13,16 @@ app.factory('BeerFactory', function () {
     var kettleHeight;
     var kettleDiameter;
 
+    var mashDuration;
+    var mashTemperature;
+    var grainTemperature;
+    var waterHeldBackFromMash = 0;
+
+    var grains = {};
+
+    var boilDuration;
+    var evaporationRateAdjustment;
+
 
     service.setKettleHeight = function (height) {
         kettleHeight = height;
@@ -22,9 +32,58 @@ app.factory('BeerFactory', function () {
         kettleDiameter = diameter;
     };
 
+    service.setMashDuration = function(duration) {
+        mashDuration = duration;
+    };
+
+    service.setMashTemperature = function (temperature) {
+        mashTemperature = temperature;
+    };
+
+    service.setGrainTemperature = function (temperature) {
+        grainTemperature = temperature;
+    };
+
     service.kettleVolume = function () {
         return cmCubedToLitres(cylinderVolume(kettleHeight, kettleDiameter));
     };
+
+    service.grainWeight = function () {
+        var weight = 0;
+        for (var grain in grains){
+            weight += grain.grams;
+        }
+
+        if (weight == 0 ){
+            return null;
+        }
+        return weight;
+
+    };
+
+    service.strikeTemperature = function () {
+
+        if (totalWaterNeeded !== null && service.grainWeight() !== null && mashTemperature !== null && grainTemperature !== null) {
+            return (getStrikeWaterTempAdjustmentFactor() / ((totalWaterNeeded - waterHeldBackFromMash) / (service.grainWeight() / 1000))) * (mashTemperature - grainTemperature) + mashTemperature;
+        } else {
+            return null
+        }
+    };
+
+    service.evaporation = function () {
+        if (boilDuration !== null && evaporationRateAdjustment !== null) {
+            return evaporationRateAdjustment / 60 * boilDuration;
+        } else if (boilDuration !== null && kettleDiameter !== null) {
+            return (Math.PI * (kettleDiameter / 2) * (kettleDiameter / 2) * 0.00428 / 60 * boilDuration);
+
+        } else {
+            return null;
+        }
+    };
+
+
+
+
 
     return service;
 });
@@ -44,6 +103,29 @@ app.controller('BeerController', function($scope, BeerFactory) {
 
     $scope.kettleVolume = function(){
         return BeerFactory.kettleVolume();
+    }
+});
+
+app.controller('MashController', function ($scope, BeerFactory) {
+
+    $scope.mashDuration = null;
+    $scope.mashTemperature = null;
+    $scope.grainTemperature = null;
+
+    $scope.$watch('mashDuration', function (newValue) {
+        BeerFactory.setMashDuration(newValue);
+    });
+
+    $scope.$watch('mashTemperature', function (newValue) {
+        BeerFactory.setMashTemperature(newValue);
+    });
+
+    $scope.$watch('grainTemperature', function (newValue) {
+        BeerFactory.setGrainTemperature(newValue);
+    });
+
+    $scope.strikeTemperature = function () {
+        return BeerFactory.strikeTemperature();
     }
 });
 
@@ -265,20 +347,4 @@ function mashVolume(totalWaterNeeded, totalGrainWeight, strikeWaterNeeded, water
 
 function volumeIntoBoil(){
     // =IF(AND(ISNUMBER(CQ39),ISNUMBER(CQ42)),CQ42+CQ39-EA76/0.9614,"")
-}
-
-
-function evaporation(boilDuration, evaporationRateAdjustment, kettleDiameter) {
-    // =IF(ISNUMBER(DY92),DY92/60*BP33,IF(AND(ISNUMBER(AV27),ISNUMBER(BP33)),(PI()*(AV27/2)*(AV27/2)*0.00428/60*BP33),""))
-
-    if ( boilDuration !== null ) {
-        if (evaporationRateAdjustment !== null){
-            return evaporationRateAdjustment/60*boilDuration;
-        } else if (kettleDiameter !== null ){
-            return (Math.Pi*(kettleDiameter/2)*(kettleDiameter/2)*0.00428/60*boilDuration);
-        }
-
-    } else {
-        return null;
-    }
 }

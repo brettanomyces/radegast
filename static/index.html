@@ -167,8 +167,7 @@
                         <label>Kettle Capacity</label>
                     </div>
                     <div class="medium-8 columns">
-                        {{kettleVolume() | number:1}}
-                    </div>
+                     </div>
                     <div class="medium-1 columns">
                         <label class="inline">L</label>
                     </div>
@@ -349,13 +348,13 @@
                         <label>Pure BIAB (Full-Volume Mash)</label>
                     </div>
                     <div class="medium-2 columns">
-                        <input type="number" ng-model="mash.time">
+                        <input type="number" ng-model="mashDuration">
                     </div>
                     <div class="medium-2 columns">
                         <label>mins at</label>
                     </div>
                     <div class="medium-2 columns">
-                        <input type="number" ng-model="mash.temp">
+                        <input type="number" ng-model="mashTemperature">
                     </div>
                 </div>
 
@@ -364,13 +363,13 @@
                         <label>If grain is </label>
                     </div>
                     <div class="medium-2 columns">
-                        <input type="number" ng-model="mash.grainTemp">
+                        <input type="number" ng-model="grainTemperature">
                     </div>
                     <div class="medium-2 columns">
                         <label>then strike at </label>
                     </div>
                     <div class="medium-2 columns">
-                        <input type="number" ng-model="mash.strikeTemp" disabled>
+                        {{kettleVolume() | number:1}}
                     </div>
                 </div>
             </form>
