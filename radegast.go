@@ -19,9 +19,9 @@ var (
 )
 
 type Recipe struct {
-	Id      bson.ObjectId `bson:"_id" json:"id"`
-	Name    string        `json:"name"`
-	Created time.Time     `json:"created"`
+	Id      bson.ObjectId `bson:"_id" json:"id, omitempty"`
+	Name    string        `bson:"name" json:"name"`
+	Created time.Time     `bson:"created" json:"created"`
 }
 
 type RecipeJSON struct {
@@ -71,10 +71,9 @@ func CreateRecipeHandler(w http.ResponseWriter, r *http.Request) {
 
 	recipe := recipeJSON.Recipe
 
-	obj_id := bson.NewObjectId()
-	recipe.Id = obj_id
+	recipe.Id = bson.NewObjectId()
 	recipe.Name = "test"
-	recipe.Created = time.Now().Local()
+	recipe.Created = time.Now()
 
 	err = collection.Insert(&recipe)
 	if err != nil {
