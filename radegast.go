@@ -42,7 +42,8 @@ func main() {
 	r.HandleFunc("/api/recipes/{id:[0-9]+}", RetrieveRecipeHandler).Methods("GET")
 	r.HandleFunc("/api/recipes/{id:[0-9]+}", UpdateRecipeHandler).Methods("PUT")
 	r.HandleFunc("/api/recipes/{id:[0-9]+}", DeleteRecipeHandler).Methods("DELETE")
-	r.HandleFunc("/api/recipes/", CreateRecipeHandler).Methods("POST")
+	r.HandleFunc("/api/recipes", CreateRecipeHandler).Methods("POST")
+	r.HandleFunc("/api/recipes", RetrieveRecipeHandler).Methods("GET")
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("static/")))
 	http.Handle("/", r)
 
@@ -91,20 +92,33 @@ func CreateRecipeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RetrieveRecipeHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
+	var j []byte
 
-	var recipes []Recipe
+	vars := mux.Vars(r)
 
-	iter := collection.Find(nil).Iter()
-	result := Recipe{}
-	for iter.Next(&result) {
-		recipes = append(recipes, result)
+	if id, ok := vars["id"]; ok {
+		var recipe Recipe
+		err := collection.Find(id).One(&recipe)
+		j, err = json.Marshal(RecipeJSON{Recipe: recipe})
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		var recipes []Recipe
+		iter := collection.Find(nil).Iter()
+		result := Recipe{}
+		for iter.Next(&result) {
+			recipes = append(recipes, result)
+		}
+
+		j, err = json.Marshal(RecipesJSON{Recipes: recipes})
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	j, err := json.Marshal(RecipesJSON{Recipes: recipes})
-	if err != nil {
-		panic(err)
-	}
 	w.Write(j)
 	log.Println("provided json")
 }
