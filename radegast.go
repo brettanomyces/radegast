@@ -43,8 +43,8 @@ func main() {
 	r.HandleFunc("/api/recipes/{id:[0-9]+}", UpdateRecipeHandler).Methods("PUT")
 	r.HandleFunc("/api/recipes/{id:[0-9]+}", DeleteRecipeHandler).Methods("DELETE")
 	r.HandleFunc("/api/recipes/", CreateRecipeHandler).Methods("POST")
-	http.Handle("/api/", r)
-	http.Handle("/", http.FileServer(http.Dir(".")))
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("static/")))
+	http.Handle("/", r)
 
 	log.Println("Starting mongo db session")
 	// MongoDB
