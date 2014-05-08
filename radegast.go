@@ -99,7 +99,7 @@ func RetrieveRecipeHandler(w http.ResponseWriter, r *http.Request) {
 
 	if id, ok := vars["id"]; ok {
 		var recipe Recipe
-		err := collection.Find(id).One(&recipe)
+		err = collection.Find(id).One(&recipe)
 		j, err = json.Marshal(RecipeJSON{Recipe: recipe})
 		if err != nil {
 			panic(err)
