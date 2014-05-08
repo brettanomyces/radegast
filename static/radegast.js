@@ -81,14 +81,20 @@ app.factory('BeerFactory', function () {
         }
     };
 
-
-
-
-
     return service;
 });
 
-app.controller('BeerController', function($scope, BeerFactory) {
+app.controller('RecipeController', function($scope, $http, BeerFactory) {
+
+	$scope.recipeName = null;
+
+	$http.get('localhost:8080/api/recipes/1')
+	.success(function(recipe) {
+		$scope.recipeName = recipe.name
+	});
+});
+
+app.controller('VolumeController', function($scope, BeerFactory) {
 
     $scope.kettleHeight = null;
     $scope.kettleDiameter = null;
@@ -127,6 +133,28 @@ app.controller('MashController', function ($scope, BeerFactory) {
     $scope.strikeTemperature = function () {
         return BeerFactory.strikeTemperature();
     }
+});
+
+app.controller('GrainController', function($scope, BeerFactory){
+
+    $scope.grains = BeerFactory.grains;
+
+    $scope.addGrain = function () {
+        $scope.grains.push({
+            name: undefined,
+            ebc: undefined,
+            grams : undefined
+        });
+    };
+
+    $scope.removeGrain = function(grain) {
+        var index=$scope.grains.indexOf(grain);
+        $scope.grains.splice(index,1);
+    }
+
+
+
+
 });
 
 function GrainBillController($scope){
