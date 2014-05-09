@@ -3,23 +3,9 @@
  */
 
 var app = angular.module('Radegast', [
-    'ngRoute'
     'mm.foundation'
 ]);
 
-app.config(function($routeProvider, $locationProvider) {
-	$routeProvider
-		.when('recipe/:recipeId', {
-			templateUrl: 'recipe.html',
-			controller: 'RecipeController',
-			resolve: {
-			}
-		})
-		.when('recipe/:recipeId/brew/:brewId', {
-			templateUrl: 'brew.html'
-			controller: 'RecipeController'
-		});
-});
 
 app.factory('BeerFactory', function () {
 
@@ -47,7 +33,7 @@ app.factory('BeerFactory', function () {
         kettleDiameter = diameter;
     };
 
-    service.setMashDuration = function(duration) {
+    service.setMashDuration = function (duration) {
         mashDuration = duration;
     };
 
@@ -65,11 +51,11 @@ app.factory('BeerFactory', function () {
 
     service.grainWeight = function () {
         var weight = 0;
-        for (var grain in grains){
+        for (var grain in grains) {
             weight += grain.grams;
         }
 
-        if (weight == 0 ){
+        if (weight == 0) {
             return null;
         }
         return weight;
@@ -99,30 +85,47 @@ app.factory('BeerFactory', function () {
     return service;
 });
 
-app.controller('RecipeController', function($scope, $http, BeerFactory) {
+app.controller('HomeController', function ($scope, $http) {
 
-	$scope.recipeName = null;
+    $scope.recipes = [];
 
-	$http.get('localhost:8080/api/recipes/1')
-	.success(function(recipe) {
-		$scope.recipeName = recipe.name
-	});
+    $scope.getRecipes = function () {
+        $http({method: 'GET', url: 'http://localhost:8080/api/recipes'}).
+            success(function (data, status, headers, config) {
+                $scope.recipes = data.recipes;
+            }).
+            error(function (data, status) {
+            });
+    };
+
+    $scope.getRecipes();
 });
 
-app.controller('VolumeController', function($scope, BeerFactory) {
+app.controller('RecipeController', function ($scope, $http, BeerFactory) {
+
+    $scope.recipe = null;
+
+    $http({method: 'GET', url: 'localhost:8080/api/recipes/1'}).
+        success(function (data, status, headers, config) {
+            $scope.recipeName = data.recipe;
+        }
+    );
+});
+
+app.controller('VolumeController', function ($scope, BeerFactory) {
 
     $scope.kettleHeight = null;
     $scope.kettleDiameter = null;
 
-    $scope.$watch('kettleHeight', function(newValue){
+    $scope.$watch('kettleHeight', function (newValue) {
         BeerFactory.setKettleHeight(newValue);
     });
 
-    $scope.$watch('kettleDiameter', function(newValue){
+    $scope.$watch('kettleDiameter', function (newValue) {
         BeerFactory.setKettleDiameter(newValue);
     });
 
-    $scope.kettleVolume = function(){
+    $scope.kettleVolume = function () {
         return BeerFactory.kettleVolume();
     }
 });
@@ -150,7 +153,7 @@ app.controller('MashController', function ($scope, BeerFactory) {
     }
 });
 
-app.controller('GrainController', function($scope, BeerFactory){
+app.controller('GrainController', function ($scope, BeerFactory) {
 
     $scope.grains = BeerFactory.grains;
 
@@ -158,50 +161,52 @@ app.controller('GrainController', function($scope, BeerFactory){
         $scope.grains.push({
             name: undefined,
             ebc: undefined,
-            grams : undefined
+            grams: undefined
         });
     };
 
-    $scope.removeGrain = function(grain) {
-        var index=$scope.grains.indexOf(grain);
-        $scope.grains.splice(index,1);
+    $scope.removeGrain = function (grain) {
+        var index = $scope.grains.indexOf(grain);
+        $scope.grains.splice(index, 1);
     }
-
-
 
 
 });
 
-function GrainBillController($scope){
+function GrainBillController($scope) {
 
     $scope.requiredOg = undefined;
-    $scope.grains = [{name: "", ebc: undefined, grams : undefined}];
+    $scope.grains = [
+        {name: "", ebc: undefined, grams: undefined}
+    ];
 
 
     $scope.addGrain = function () {
         $scope.grains.push({
             name: undefined,
             ebc: undefined,
-            grams : undefined
+            grams: undefined
         });
     };
 
-    $scope.removeGrain = function(grain) {
-        var index=$scope.grains.indexOf(grain);
-        $scope.grains.splice(index,1);
+    $scope.removeGrain = function (grain) {
+        var index = $scope.grains.indexOf(grain);
+        $scope.grains.splice(index, 1);
     }
 }
 
-function HopBillController($scope){
+function HopBillController($scope) {
 
-    $scope.hops = [{
-        name: undefined,
-        form: undefined,
-        method: undefined,
-        alphaAcid: undefined,
-        minutes: undefined,
-        grams : undefined
-    }];
+    $scope.hops = [
+        {
+            name: undefined,
+            form: undefined,
+            method: undefined,
+            alphaAcid: undefined,
+            minutes: undefined,
+            grams: undefined
+        }
+    ];
 
 
     $scope.addHop = function () {
@@ -211,25 +216,27 @@ function HopBillController($scope){
             method: undefined,
             alphaAcid: undefined,
             minutes: undefined,
-            grams : undefined
+            grams: undefined
         });
     };
 
-    $scope.removeHop = function(hop) {
-        var index=$scope.hops.indexOf(hop);
-        $scope.hops.splice(index,1);
+    $scope.removeHop = function (hop) {
+        var index = $scope.hops.indexOf(hop);
+        $scope.hops.splice(index, 1);
     }
 }
 
-function MiscellaneousController($scope){
+function MiscellaneousController($scope) {
 
-    $scope.items = [{
-        name: undefined,
-        amount: undefined,
-        stage: undefined,
-        minutes: undefined,
-        reason : undefined
-    }];
+    $scope.items = [
+        {
+            name: undefined,
+            amount: undefined,
+            stage: undefined,
+            minutes: undefined,
+            reason: undefined
+        }
+    ];
 
 
     $scope.addItem = function () {
@@ -238,39 +245,39 @@ function MiscellaneousController($scope){
             amount: undefined,
             stage: undefined,
             minutes: undefined,
-            reason : undefined
+            reason: undefined
         });
     };
 
-    $scope.removeItem = function(item) {
-        var index=$scope.hops.indexOf(item);
-        $scope.items.splice(index,1);
+    $scope.removeItem = function (item) {
+        var index = $scope.hops.indexOf(item);
+        $scope.items.splice(index, 1);
     }
 }
 
-function cylinderVolume(diameter, height){
+function cylinderVolume(diameter, height) {
     // console.log("Diameter: " + diameter + ", Height: " + height);
     var radius = diameter / 2;
     return Math.PI * radius * radius * height;
 }
 
-function cmCubedToLitres(cmCubed){
+function cmCubedToLitres(cmCubed) {
     return cmCubed / 1000;
 }
 
-function ibu(utilization, alphaAcid, grams, litres, correction){
+function ibu(utilization, alphaAcid, grams, litres, correction) {
     return (utilization * alphaAcid * grams) / (litres * correction) * 1000
 }
 
-function ibuCorrection(gravityOfBoil){
-    if (gravityOfBoil <= 1.050){
+function ibuCorrection(gravityOfBoil) {
+    if (gravityOfBoil <= 1.050) {
         return 1;
     } else {
         return 1 + (gravityOfBoil - 1.050) / 0.2;
     }
 }
 
-function alcoholByVolume(originalGravity, terminalGravity){
+function alcoholByVolume(originalGravity, terminalGravity) {
     return (originalGravity - terminalGravity) / 0.75;
 }
 
@@ -300,11 +307,11 @@ function totalWaterNeeded(totalGrainWeight, volumeIntoBoil, waterAddedDuringBoil
     // =IF(AND(ISNUMBER(BH79),ISNUMBER(B:DF)),IF(EB104>0,(EB104*BH79/1000)+CQ36*0.9614+EA76+EA79,(0.628*BH79/1000)+CQ36*0.9614+EA76+EA79),"")
 
 
-    if (totalGrainWeight !== null && volumeIntoBoil !== null){
-        if (volumeLostFromLauterAdjustment !== null){
-            return (volumeLostFromLauterAdjustment*totalGrainWeight/1000)+(volumeIntoBoil*0.9614)+waterAddedDuringBoil+waterAddedToFermenter;
+    if (totalGrainWeight !== null && volumeIntoBoil !== null) {
+        if (volumeLostFromLauterAdjustment !== null) {
+            return (volumeLostFromLauterAdjustment * totalGrainWeight / 1000) + (volumeIntoBoil * 0.9614) + waterAddedDuringBoil + waterAddedToFermenter;
         } else {
-            return (0.628*totalGrainWeight/1000)+(volumeIntoBoil*0.9614)+waterAddedDuringBoil+waterAddedToFermenter;
+            return (0.628 * totalGrainWeight / 1000) + (volumeIntoBoil * 0.9614) + waterAddedDuringBoil + waterAddedToFermenter;
 
         }
     } else {
@@ -313,7 +320,7 @@ function totalWaterNeeded(totalGrainWeight, volumeIntoBoil, waterAddedDuringBoil
 }
 
 function getStrikeWaterTempAdjustmentFactor() {
-    if (strikeWaterTempAdjustmentFactor !== null ){
+    if (strikeWaterTempAdjustmentFactor !== null) {
         return strikeWaterTempAdjustmentFactor;
     } else {
         return 0.41
@@ -375,19 +382,19 @@ function strikeWaterNeeded(totalWaterNeeded, waterHeldBackFromMash) {
  * @param waterAddedToFermenter
  * @returns {*}
  */
-function mashVolume(totalWaterNeeded, totalGrainWeight, strikeWaterNeeded, waterHeldBackFromMash, waterUsedInASparge, waterAddedBeforeBoil, waterAddedDuringBoil, waterAddedToFermenter){
+function mashVolume(totalWaterNeeded, totalGrainWeight, strikeWaterNeeded, waterHeldBackFromMash, waterUsedInASparge, waterAddedBeforeBoil, waterAddedDuringBoil, waterAddedToFermenter) {
 
     if (totalGrainWeight !== null) {
-        if (totalWaterNeeded !== null && waterHeldBackFromMash != null){
-            return ((totalWaterNeeded-waterUsedInASparge-waterAddedBeforeBoil-waterAddedDuringBoil-waterAddedToFermenter)*1.019794)+(totalGrainWeight/1000*0.75);
-        } else if (strikeWaterNeeded !== null){
-            return strikeWaterNeeded+(totalGrainWeight/1000*0.75);
+        if (totalWaterNeeded !== null && waterHeldBackFromMash != null) {
+            return ((totalWaterNeeded - waterUsedInASparge - waterAddedBeforeBoil - waterAddedDuringBoil - waterAddedToFermenter) * 1.019794) + (totalGrainWeight / 1000 * 0.75);
+        } else if (strikeWaterNeeded !== null) {
+            return strikeWaterNeeded + (totalGrainWeight / 1000 * 0.75);
         }
     } else {
         return null;
     }
 }
 
-function volumeIntoBoil(){
+function volumeIntoBoil() {
     // =IF(AND(ISNUMBER(CQ39),ISNUMBER(CQ42)),CQ42+CQ39-EA76/0.9614,"")
 }
