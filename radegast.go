@@ -39,11 +39,11 @@ func main() {
 	log.Println("Starting Server")
 
 	r := mux.NewRouter()
-	r.HandleFunc("/api/recipes/{id:[0-9]+}", RetrieveRecipeHandler).Methods("GET")
-	r.HandleFunc("/api/recipes/{id:[0-9]+}", UpdateRecipeHandler).Methods("PUT")
-	r.HandleFunc("/api/recipes/{id:[0-9]+}", DeleteRecipeHandler).Methods("DELETE")
+	r.HandleFunc("/api/recipes/{id:[0-9a-z]{24}}", RetrieveRecipeHandler).Methods("GET")
+	r.HandleFunc("/api/recipes/{id:[0-9a-z]{24}}", UpdateRecipeHandler).Methods("PUT")
+	r.HandleFunc("/api/recipes/{id:[0-9a-z]{24}}", DeleteRecipeHandler).Methods("DELETE")
 	r.HandleFunc("/api/recipes", CreateRecipeHandler).Methods("POST")
-	r.HandleFunc("/api/recipes", RetrieveRecipeHandler).Methods("GET")
+	r.HandleFunc("/api/recipes", RetrieveRecipeListHandler).Methods("GET")
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("static/")))
 	http.Handle("/", r)
 
@@ -91,30 +91,39 @@ func CreateRecipeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RetrieveRecipeHandler(w http.ResponseWriter, r *http.Request) {
-	var err error
-	var j []byte
 
 	vars := mux.Vars(r)
-
-	if id, ok := vars["id"]; ok {
-		var recipe Recipe
-		err = collection.Find(id).One(&recipe)
-		j, err = json.Marshal(RecipeJSON{Recipe: recipe})
+	if bson.IsObjectIdHex(vars["id"]) {
+		var result Recipe
+		id := bson.ObjectIdHex(vars["id"])
+		err := collection.Find(bson.M{"_id": id}).One(&result)
 		if err != nil {
 			panic(err)
 		}
+
+		j, err := json.Marshal(RecipeJSON{Recipe: result})
+		if err != nil {
+			panic(err)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(j)
 	} else {
-		var recipes []Recipe
-		iter := collection.Find(nil).Iter()
-		result := Recipe{}
-		for iter.Next(&result) {
-			recipes = append(recipes, result)
-		}
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
 
-		j, err = json.Marshal(RecipesJSON{Recipes: recipes})
-		if err != nil {
-			panic(err)
-		}
+func RetrieveRecipeListHandler(w http.ResponseWriter, r *http.Request) {
+	var recipes []Recipe
+
+	iter := collection.Find(nil).Iter()
+	result := Recipe{}
+	for iter.Next(&result) {
+		recipes = append(recipes, result)
+	}
+
+	j, err := json.Marshal(RecipesJSON{Recipes: recipes})
+	if err != nil {
+		panic(err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
