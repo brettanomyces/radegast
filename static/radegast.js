@@ -3,8 +3,23 @@
  */
 
 var app = angular.module('Radegast', [
+    'ngRoute'
     'mm.foundation'
 ]);
+
+app.config(function($routeProvider, $locationProvider) {
+	$routeProvider
+		.when('recipe/:recipeId', {
+			templateUrl: 'recipe.html',
+			controller: 'RecipeController',
+			resolve: {
+			}
+		})
+		.when('recipe/:recipeId/brew/:brewId', {
+			templateUrl: 'brew.html'
+			controller: 'RecipeController'
+		});
+});
 
 app.factory('BeerFactory', function () {
 
