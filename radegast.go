@@ -23,13 +23,10 @@ type Recipe struct {
 	Id      bson.ObjectId `bson:"_id" json:"id, omitempty"`
 	Name    string        `bson:"name" json:"name"`
 	Created time.Time     `bson:"created" json:"created"`
+	Style   string        `bson:"style" json:"style"`
 }
 
-type RecipeJSON struct {
-	Recipe Recipe `json:"recipe"`
-}
-
-type RecipesJSON struct {
+type Recipes struct {
 	Recipes []Recipe `json:"recipes"`
 }
 
@@ -82,14 +79,12 @@ func AppHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateRecipeHandler(w http.ResponseWriter, r *http.Request) {
-	var recipeJSON RecipeJSON
+	var recipe Recipe
 
-	err := json.NewDecoder(r.Body).Decode(&recipeJSON)
+	err := json.NewDecoder(r.Body).Decode(&recipe)
 	if err != nil {
 		panic(err)
 	}
-
-	recipe := recipeJSON.Recipe
 
 	recipe.Id = bson.NewObjectId()
 	recipe.Name = "test"
@@ -102,7 +97,7 @@ func CreateRecipeHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Inserted new recipe %s with name %s", recipe.Id, recipe.Name)
 	}
 
-	j, err := json.Marshal(RecipeJSON{Recipe: recipe})
+	j, err := json.Marshal(recipe)
 	if err != nil {
 		panic(err)
 	}
@@ -121,7 +116,7 @@ func RetrieveRecipeHandler(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		j, err := json.Marshal(RecipeJSON{Recipe: result})
+		j, err := json.Marshal(result)
 		if err != nil {
 			panic(err)
 		}
@@ -141,7 +136,7 @@ func RetrieveRecipeListHandler(w http.ResponseWriter, r *http.Request) {
 		recipes = append(recipes, result)
 	}
 
-	j, err := json.Marshal(RecipesJSON{Recipes: recipes})
+	j, err := json.Marshal(Recipes{Recipes: recipes})
 	if err != nil {
 		panic(err)
 	}
@@ -158,22 +153,25 @@ func UpdateRecipeHandler(w http.ResponseWriter, r *http.Request) {
 	id := bson.ObjectIdHex(vars["id"])
 
 	// Decode the indoming recipe json
-	var recipeJSON RecipeJSON
-	err = json.NewDecoder(r.Body).Decode(&recipeJSON)
+	var recipe Recipe
+	err = json.NewDecoder(r.Body).Decode(&recipe)
 	if err != nil {
-		panic(err)
+		log.Printf("Failed to decode request body for recipe %s", id)
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 
 	//Update the database
-	err = collection.Update(bson.M{"_id": id},
-		bson.M{"name": recipeJSON.Recipe.Name,
-			"_id":     id,
-			"created": recipeJSON.Recipe.Created,
-		})
+	b, err := bson.Marshal(recipe)
+	if err != nil {
+		log.Printf("Failed to marshal bson for recipe %s", id)
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	err = collection.Update(bson.M{"_id": id}, b)
 	if err == nil {
-		log.Printf("Updated recipe %s name to %s", id, recipeJSON.Recipe.Name)
+		log.Printf("Updated recipe: %s %s", id, recipe.Name)
 	} else {
-		panic(err)
+		log.Printf("Failed to updated collection for recipe %s", id)
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 	w.WriteHeader(http.StatusNoContent)
 }

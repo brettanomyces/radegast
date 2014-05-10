@@ -2,5 +2,118 @@
 	<h1>
 		{{recipe.name}}
 	</h1>
+	<div>
+		<h3>
+			Overview
+		</h3>
+		<hr>
+
+		<div class="row">
+			<div class="small-3 columns">
+				<label>Style:</label>
+			</div>
+			<div class="small-9 columns">
+				<input type="text" ng-model="recipe.style">
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="small-3 columns">
+				<label>Expected Original Gravity:</label>
+			</div>
+			<div class="small-9 columns">
+				<input type="text" disabled ng-model="recipe.expectedOG">
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="small-3 columns">
+				<label>ABV:</label>
+			</div>
+			<div class="small-9 columns">
+				<input type="text" disabled ng-model="recipe.abv">
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="small-3 columns">
+				<label>IBU (Tins):</label>
+			</div>
+			<div class="small-9 columns">
+				<input type="text" disabled ng-model="recipe.ibu">
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="small-3 columns">
+				<label>Bitterness to Gravity Ratio:</label>
+			</div>
+			<div class="small-9 columns">
+				<input type="text" disabled ng-model="recipe.bitternessGravityRatio">
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="small-3 columns">
+				<label>Color (EBC):</label>
+			</div>
+			<div class="small-9 columns">
+				<input type="text" disabled ng-model="recipe.color">
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="small-3 columns">
+				<label>Link:</label>
+			</div>
+			<div class="small-9 columns">
+				<input type="text" disabled ng-model="recipe.link">
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="small-3 columns">
+				<label>Credits:</label>
+			</div>
+			<div class="small-9 columns">
+				<input type="text" disabled ng-model="recipe.credits">
+			</div>
+		</div>
+	</div>
+	
+	<div>
+		<h3>
+			Grain Bill
+		</h3>
+		<hr>
+
+		<div class="row">
+			<div class="small-9 columns">
+				<label>This recipe require an Original Gravity of:</label>
+			</div>
+			<div class="small-3 columns">
+				<input type="text" ng-model="recipe.og">
+			</div>
+		</div>
+
+		<button ng-click="addGrain()" class="button">
+			Add Grain
+		</button>
+	</div>
+
+
+	<div>
+		<h3>
+			Hop Bill
+		</h3>
+		<hr>
+		<button ng-click="addHop()" class="button">
+			Add Hop
+		</button>
+	</div>
+
+	<button ng-click="putRecipe()" class="button">
+		Save Recipe
+	</button>
 </div>
 

@@ -32,11 +32,25 @@ radegastApp.controller('RecipeItemCtrl', ['$scope', '$http', '$routeParams',
 				method: 'GET', 
 				url: 'http://localhost:8080/api/recipes/' + $routeParams.id
 			}).success(function (data, status, headers, config) {
-				$scope.recipe = data.recipe; 
+                                console.log("test");
+				$scope.recipe = data;
 			}).error(function () {
 				// do something
 			});
 		};
+
+                $scope.putRecipe = function() {
+                  $http({
+                    method: 'PUT',
+                    url: 'http://localhost:8080/api/recipes/' + $routeParams.id,
+                    data: $scope.recipe
+                  }).success(function (data, status, headers, config) {
+                    // do something
+                    console.log("Recipe Saved");
+                  }).error(function (data, status) {
+                    // notify user
+                  });
+                };
 
 		$scope.getRecipe();
 	}
