@@ -1,21 +1,15 @@
-
-<div class="columns border large-12 medium-11 small-11 small-centered">
-	<section id="recipes">
-		<div class="page-header">
-			<h1>
-				Recipes
-			</h1>
-		</div>
-		
-		<h3>
-			Your Recipes
-		</h3>
-		<hr></hr>
-		<div ng-controller="RecipeListCtrl" ng-repeat="recipe in recipes">
-			<h5 class="subheader">
-				<a href="#/recipes/{{recipe.id}}" class="small-12 columns">{{recipe.name}}</a>
-			</h5>
-			<hr></hr>
-		</div>
-	</section>
+<div>
+	<h1>
+		Recipes
+	</h1>
+</div>
+<h3>
+	Your Recipes
+</h3>
+<hr></hr>
+<div  ng-repeat="recipe in recipes">
+	<h5>
+		<a href="#/recipes/{{recipe.id}}" class="text-center">{{recipe.name}}</a>
+	</h5>
+	<hr></hr>
 </div>

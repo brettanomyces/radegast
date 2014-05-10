@@ -15,7 +15,9 @@ radegastApp.config(function($routeProvider, $locationProvider) {
 		templateUrl: '/templates/recipeItem.html',
 		controller: 'RecipeItemCtrl'
 	})
-	.otherwise({redirectTo: '/'});
+	.otherwise({
+		redirectTo: '/'
+	});
 
 	// configure html5 to get links working on jsfiddle
 	$locationProvider.html5Mode(true);
