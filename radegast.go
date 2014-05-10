@@ -160,13 +160,7 @@ func UpdateRecipeHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	//Update the database
-	b, err := bson.Marshal(recipe)
-	if err != nil {
-		log.Printf("Failed to marshal bson for recipe %s", id)
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-	err = collection.Update(bson.M{"_id": id}, b)
+	err = collection.Update(bson.M{"_id": id}, recipe)
 	if err == nil {
 		log.Printf("Updated recipe: %s %s", id, recipe.Name)
 	} else {
