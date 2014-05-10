@@ -3,11 +3,30 @@
  */
 
 var app = angular.module('Radegast', [
+    'ngRoute',
     'mm.foundation'
 ]);
 
+app.config(function($routeProvider, $locationProvider) {
+	'use strict';
+    $routeProvider
+        .when('/', {
+            templateUrl: 'home.html',
+            controller: 'HomeController'
+        })
+	.when('/recipe/:id', {
+            templateUrl: 'recipe.html',
+            controller: 'RecipeController'
+        })
+	.otherwise({redirectTo: '/'});
+
+    // configure html5 to get links working on jsfiddle
+    $locationProvider.html5Mode(true);
+});
+
 
 app.factory('BeerFactory', function () {
+	'use strict';
 
     var service = {};
 
@@ -55,7 +74,7 @@ app.factory('BeerFactory', function () {
             weight += grain.grams;
         }
 
-        if (weight == 0) {
+        if (weight === 0) {
             return null;
         }
         return weight;
@@ -67,7 +86,7 @@ app.factory('BeerFactory', function () {
         if (totalWaterNeeded !== null && service.grainWeight() !== null && mashTemperature !== null && grainTemperature !== null) {
             return (getStrikeWaterTempAdjustmentFactor() / ((totalWaterNeeded - waterHeldBackFromMash) / (service.grainWeight() / 1000))) * (mashTemperature - grainTemperature) + mashTemperature;
         } else {
-            return null
+            return null;
         }
     };
 
@@ -86,6 +105,7 @@ app.factory('BeerFactory', function () {
 });
 
 app.controller('HomeController', function ($scope, $http) {
+	'use strict';
 
     $scope.recipes = [];
 
@@ -95,13 +115,16 @@ app.controller('HomeController', function ($scope, $http) {
                 $scope.recipes = data.recipes;
             }).
             error(function (data, status) {
-            });
+        });
     };
 
     $scope.getRecipes();
 });
 
-app.controller('RecipeController', function ($scope, $http, BeerFactory) {
+app.controller('RecipeController', function ($scope, $http, $log, $routeParams) {
+	'use strict';
+
+	var id = $routeParams.id;
 
     $scope.recipe = null;
 
