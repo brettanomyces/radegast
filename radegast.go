@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -39,12 +40,19 @@ func main() {
 	log.Println("Starting Server")
 
 	r := mux.NewRouter()
+	// API URLs
 	r.HandleFunc("/api/recipes/{id:[0-9a-z]{24}}", RetrieveRecipeHandler).Methods("GET")
 	r.HandleFunc("/api/recipes/{id:[0-9a-z]{24}}", UpdateRecipeHandler).Methods("PUT")
 	r.HandleFunc("/api/recipes/{id:[0-9a-z]{24}}", DeleteRecipeHandler).Methods("DELETE")
 	r.HandleFunc("/api/recipes", CreateRecipeHandler).Methods("POST")
 	r.HandleFunc("/api/recipes", RetrieveRecipeListHandler).Methods("GET")
+
+	// WebApp URLs
+	r.HandleFunc("/recipes/{id:[0-9a-z]{24}}", AppHandler).Methods("GET")
+
+	// Resources
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("static/")))
+
 	http.Handle("/", r)
 
 	log.Println("Starting mongo db session")
@@ -59,6 +67,18 @@ func main() {
 
 	log.Println("Listening on 8080")
 	http.ListenAndServe(":8080", nil)
+}
+
+func AppHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Handling url: %s", r.URL.String())
+	// TODO load file into memory once. Left like this for now for testing
+	index, err := ioutil.ReadFile("static/index.html")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		w.Header().Set("Content-Type", "text/html")
+		w.Write(index)
+	}
 }
 
 func CreateRecipeHandler(w http.ResponseWriter, r *http.Request) {
