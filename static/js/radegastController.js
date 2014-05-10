@@ -1,9 +1,9 @@
 'use strict';
 
-radegastApp.controller('MainCtrl', ['$scope', '$route', '$routeParams', '$location',
-	function ($scope, $route, $routeParams, $location) {
+radegastApp.controller('MainCtrl', ['$scope', '$route', '$routeParams', 
+	function ($scope, $route, $routeParams) {
 		$scope.$route = $route;
-		$scope.$location = $location;
+		// $scope.$location = $location;
 		$scope.$routeParams = $routeParams;
 	}
 ]);
@@ -17,9 +17,11 @@ radegastApp.controller('RecipeListCtrl', ['$scope', '$http', '$routeParams',
 		$scope.getRecipes = function () {
 			$http({method: 'GET', url: 'http://localhost:8080/api/recipes'}).
 				success(function (data, status, headers, config) {
-				$scope.recipes = data.recipes;
-				}).error(function (data, status) {
-			});
+					$scope.recipes = data.recipes; 
+				}).
+				error(function (data, status) {
+					//do something
+				});
 		};
 
 		$scope.getRecipes();
