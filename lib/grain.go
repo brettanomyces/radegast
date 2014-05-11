@@ -1,7 +1,7 @@
 package lib
 
 type Grain struct {
-	Name  string `bson:"name" json:"name"`
-	Ebc   string `bson:"ebc" json:"ebc"`
-	Grams string `bson:"grams" json:"grams"`
+	Name  string `json:"name"`
+	Ebc   string `json:"ebc"`
+	Grams string `json:"grams"`
 }

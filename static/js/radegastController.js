@@ -47,8 +47,8 @@ radegastApp.controller('RecipeItemCtrl', ['$scope', '$routeParams', 'recipeFacto
         };
 
         $scope.deleteGrain = function (grain) {
-            var index = $scope.grains.indexOf(grain);
-            $scope.grains.splice(index, 1);
+            var index = $scope.recipe.grains.indexOf(grain);
+            $scope.recipe.grains.splice(index, 1);
         };
 
         $scope.insertHop = function() {
@@ -58,9 +58,9 @@ radegastApp.controller('RecipeItemCtrl', ['$scope', '$routeParams', 'recipeFacto
             $scope.recipe.hops.push({})
         };
 
-        $scope.deleteHops = function (hop) {
-            var index = $scope.hops.indexOf(hop);
-            $scope.hops.splice(index, 1);
+        $scope.deleteHop = function (hop) {
+            var index = $scope.recipe.hops.indexOf(hop);
+            $scope.recipe.hops.splice(index, 1);
         };
 
 }]);

@@ -8,12 +8,12 @@ import (
 
 type Recipe struct {
 	Id        bson.ObjectId `bson:"_id" json:"id, omitempty"`
-	Name      string        `bson:"name" json:"name"`
-	Created   time.Time     `bson:"created" json:"created"`
-	Style     string        `bson:"style" json:"style"`
-	Og		  float64		"og"
-	Grains    []Grain       `bson:"grains" json:"grains"`
-	Hops	  []Hop	        `bson:"hops" json:"hops"`
+	Name      string		`json:"name"`
+	Created   time.Time `json:"created"`
+	Style     string `json:"style"`
+	Og		  float64		`json:"og,string"`
+	Grains    []Grain `json:"grains"`
+	Hops	  []Hop `json:"hops"`
 }
 
 type Recipes struct {
