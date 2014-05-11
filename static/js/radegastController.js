@@ -51,4 +51,16 @@ radegastApp.controller('RecipeItemCtrl', ['$scope', '$routeParams', 'recipeFacto
             $scope.grains.splice(index, 1);
         };
 
+        $scope.insertHop = function() {
+            if ($scope.recipe.hops == null) {
+                $scope.recipe.hops = [];
+            }
+            $scope.recipe.hops.push({})
+        };
+
+        $scope.deleteHops = function (hop) {
+            var index = $scope.hops.indexOf(hop);
+            $scope.hops.splice(index, 1);
+        };
+
 }]);

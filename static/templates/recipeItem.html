@@ -128,9 +128,7 @@
 						</button>
 					</td>
 				</tr>
-
 			</table>
-		
 		</div>	
 
 		<button ng-click="insertGrain()" class="button">
@@ -144,7 +142,47 @@
 			Hop Bill
 		</h3>
 		<hr>
-		<button ng-click="addHop()" class="button">
+
+        <div class="row">
+            <table class="small-12 columns">
+                <tr>
+                    <th>Name</th>
+                    <th>Form</th>
+                    <th>Method</th>
+                    <th>AA%</th>
+                    <th>Mins</th>
+                    <th>Grams</th>
+                </tr>
+
+                <tr ng-repeat="hop in recipe.hops">
+                    <td>
+                        <input type="text" ng-model="hop.name">
+                    </td>
+                    <td>
+                        <input type="text" ng-model="hop.form">
+                    </td>
+                    <td>
+                        <input type="text" ng-model="hop.method" disabled>
+                    </td>
+                    <td>
+                        <input type="text" ng-model="hop.aa">
+                    </td>
+                    <td>
+                        <input type="text" ng-model="hop.mins" disabled>
+                    </td>
+                    <td>
+                        <input type="text" ng-model="hop.grams" disabled>
+                    </td>
+                    <td>
+                        <button ng-click="deleteHop()" class="button">
+                            Remove Hop
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <button ng-click="insertHop()" class="button">
 			Add Hop
 		</button>
 	</div>
