@@ -12,23 +12,14 @@ import (
 	"labix.org/v2/mgo/bson"
 
 	"github.com/gorilla/mux"
+
+	"github.com/brettanomyces/radegast/lib"
 )
 
 var (
 	session    *mgo.Session
 	collection *mgo.Collection
 )
-
-type Recipe struct {
-	Id      bson.ObjectId `bson:"_id" json:"id, omitempty"`
-	Name    string        `bson:"name" json:"name"`
-	Created time.Time     `bson:"created" json:"created"`
-	Style   string        `bson:"style" json:"style"`
-}
-
-type Recipes struct {
-	Recipes []Recipe `json:"recipes"`
-}
 
 func main() {
 
@@ -79,7 +70,7 @@ func AppHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateRecipeHandler(w http.ResponseWriter, r *http.Request) {
-	var recipe Recipe
+	var recipe lib.Recipe
 
 	err := json.NewDecoder(r.Body).Decode(&recipe)
 	if err != nil {
@@ -109,7 +100,7 @@ func RetrieveRecipeHandler(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	if bson.IsObjectIdHex(vars["id"]) {
-		var result Recipe
+		var result lib.Recipe
 		id := bson.ObjectIdHex(vars["id"])
 		err := collection.Find(bson.M{"_id": id}).One(&result)
 		if err != nil {
@@ -128,15 +119,15 @@ func RetrieveRecipeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RetrieveRecipeListHandler(w http.ResponseWriter, r *http.Request) {
-	var recipes []Recipe
+	var recipes []lib.Recipe
 
 	iter := collection.Find(nil).Iter()
-	result := Recipe{}
+	result := lib.Recipe{}
 	for iter.Next(&result) {
 		recipes = append(recipes, result)
 	}
 
-	j, err := json.Marshal(Recipes{Recipes: recipes})
+	j, err := json.Marshal(lib.Recipes{Recipes: recipes})
 	if err != nil {
 		panic(err)
 	}
@@ -153,7 +144,7 @@ func UpdateRecipeHandler(w http.ResponseWriter, r *http.Request) {
 	id := bson.ObjectIdHex(vars["id"])
 
 	// Decode the indoming recipe json
-	var recipe Recipe
+	var recipe lib.Recipe
 	err = json.NewDecoder(r.Body).Decode(&recipe)
 	if err != nil {
 		log.Printf("Failed to decode request body for recipe %s", id)

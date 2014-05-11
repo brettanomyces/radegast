@@ -96,6 +96,43 @@
 			</div>
 		</div>
 
+		<div class="row">
+			<table class="small-12 columns">
+				<tr>
+					<th>Grain Name</th>
+					<th>EBC</th>
+					<th>SRM</th>
+					<th>Grams</th>
+					<th>%</th>
+				</tr>
+
+				<tr ng-repeat="grain in recipe.grains">
+					<td>
+						<input type="text" ng-model="grain">
+					</td>
+					<td>
+						<input type="text" ng-model="grain.ebc">
+					</td>
+					<td>
+						<input type="text" ng-model="grain.srm" disabled>
+					</td>
+					<td>
+						<input type="text" ng-model="grain.grams">
+					</td>
+					<td>
+						<input type="text" ng-model="grain.percent" disabled>
+					</td>
+					<td>
+						<button ng-click="removeGrain()" class="button">
+							Remove Grain
+						</button>
+					</td>
+				</tr>
+
+			</table>
+		
+		</div>	
+
 		<button ng-click="addGrain()" class="button">
 			Add Grain
 		</button>
