@@ -1,67 +1,84 @@
 'use strict';
 
-radegastApp.controller('RecipeListCtrl', ['$scope', '$http', '$routeParams',
-	function ($scope, $http, $routeParams) {
+radegastApp.controller('RecipeListCtrl', ['$scope', '$routeParams', 'recipeFactory',
+	function ($scope, $routeParams, recipeFactory) {
 
-		$scope.routeParams = $routeParams;
-		$scope.recipes = [];
+        $scope.recipes = [];
 
-		$scope.getRecipes = function () {
-			$http({
-				method: 'GET',
-				url: 'http://localhost:8080/api/recipes'
-			}).success(function (data, status, headers, config) {
-				$scope.recipes = data.recipes; 
-			}).error(function (data, status) {
-					//do something
-			});
-		};
+        getRecipes();
 
-		$scope.getRecipes();
-	}
-]);
+        function getRecipes() {
+            recipeFactory.getRecipes()
+                .success(function (data) {
+                    $scope.recipes = data.recipes;
+                })
+                .error(function (data) {
+                    // Do Something
+                });
+        }
+}]);
 
-radegastApp.controller('RecipeItemCtrl', ['$scope', '$http', '$routeParams',
-	function ($scope, $http, $routeParams) {
+radegastApp.controller('RecipeItemCtrl', ['$scope', '$routeParams', 'recipeFactory',
+    function ($scope, $routeParams, recipeFactory) {
 
-		$scope.routeParams = $routeParams;
-		$scope.recipe = {};
+        $scope.recipe = {};
 
-		$scope.getRecipe = function () {
-			$http({
-				method: 'GET', 
-				url: 'http://localhost:8080/api/recipes/' + $routeParams.id
-			}).success(function (data, status, headers, config) {
-				$scope.recipe = data;
-			}).error(function () {
-				// do something
-			});
-		};
+        getRecipe();
 
-		$scope.putRecipe = function() {
-			$http({
-				method: 'PUT',
-				url: 'http://localhost:8080/api/recipes/' + $routeParams.id,
-				data: $scope.recipe
-			}).success(function () {
-				// do something
-			}).error(function () {
-				// notify user
-			});
-		};
+        function getRecipe() {
+            recipeFactory.getRecipe($routeParams.id)
+                .success(function(data){
+                    $scope.recipe = data;
+                })
+                .error(function(data){
+                    // Do Something
+                });
+        }
 
-		$scope.addGrain = function () {
-			if ($scope.recipe.grains === undefined) {
-				$scope.recipe.grains = [];
-			}
-			$scope.recipe.grains.push({});
-		};
+}]);
 
-		$scope.removeGrain = function (grain) {
-			var index = $scope.recipe.grains.indexOf(grain);
-			$scope.recipe.grains.splice(index, 1);
-		};
+radegastApp.factory('recipeFactory', ['$http', function($http) {
 
-		$scope.getRecipe();
-	}
-]);
+    var recipeFactory = {};
+
+    recipeFactory.getRecipes = function () {
+        return $http({
+            method: 'GET',
+            url: 'http://localhost:8080/api/recipes'
+        });
+    };
+
+    recipeFactory.getRecipe = function(id) {
+        return $http({
+            method: 'GET',
+            url: 'http://localhost:8080/api/recipes/' + id
+        });
+
+    };
+
+    recipeFactory.insertRecipe = function(id) {
+        return $http({
+            method: 'POST',
+            url: 'http://localhost:8080/api/recipes/' + id
+        });
+
+    };
+
+    recipeFactory.updateRecipe = function(id) {
+        return $http({
+            method: 'PUT',
+            url: 'http://localhost:8080/api/recipes/' + id
+        });
+
+    };
+
+    recipeFactory.deleteRecipe = function(id) {
+        return $http({
+            method: 'DELETE',
+            url: 'http://localhost:8080/api/recipes/' + id
+        });
+
+    };
+
+    return recipeFactory;
+}]);
