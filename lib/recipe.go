@@ -11,7 +11,7 @@ type Recipe struct {
 	Name      string        `bson:"name" json:"name"`
 	Created   time.Time     `bson:"created" json:"created"`
 	Style     string        `bson:"style" json:"style"`
-	GrainBill Grains        `bson:"grainBill" json:"grainBill"`
+	Grains    []Grain       `bson:"grains" json:"grains"`
 }
 
 type Recipes struct {

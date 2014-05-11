@@ -108,7 +108,7 @@
 
 				<tr ng-repeat="grain in recipe.grains">
 					<td>
-						<input type="text" ng-model="grain">
+						<input type="text" ng-model="grain.name">
 					</td>
 					<td>
 						<input type="text" ng-model="grain.ebc">
@@ -123,7 +123,7 @@
 						<input type="text" ng-model="grain.percent" disabled>
 					</td>
 					<td>
-						<button ng-click="removeGrain()" class="button">
+						<button ng-click="deleteGrain()" class="button">
 							Remove Grain
 						</button>
 					</td>
@@ -133,7 +133,7 @@
 		
 		</div>	
 
-		<button ng-click="addGrain()" class="button">
+		<button ng-click="insertGrain()" class="button">
 			Add Grain
 		</button>
 	</div>
@@ -149,7 +149,7 @@
 		</button>
 	</div>
 
-	<button ng-click="putRecipe()" class="button">
+	<button ng-click="updateRecipe()" class="button">
 		Save Recipe
 	</button>
 </div>

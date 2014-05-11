@@ -5,7 +5,3 @@ type Grain struct {
 	Ebc   string `bson:"ebc" json:"ebc"`
 	Grams string `bson:"grams" json:"grams"`
 }
-
-type Grains struct {
-	Grains []Grain `json:"grains"`
-}
