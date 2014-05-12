@@ -17,12 +17,21 @@
 			</div>
 		</div>
 
+        <div class="row">
+            <div class="small-3 columns">
+                <label>Batch Size:</label>
+            </div>
+            <div class="small-9 columns">
+                <input type="text" ng-model="recipe.batchSize">
+            </div>
+        </div>
+
 		<div class="row">
 			<div class="small-3 columns">
 				<label>Expected Original Gravity:</label>
 			</div>
 			<div class="small-9 columns">
-				<input type="text" disabled ng-model="recipe.expectedOG">
+				<input type="text" disabled ng-model="recipe.og">
 			</div>
 		</div>
 
@@ -186,6 +195,54 @@
 			Add Hop
 		</button>
 	</div>
+
+
+    <div>
+        <h3>
+            Miscellaneous
+        </h3>
+        <hr>
+
+        <div class="row">
+            <table class="small-12 columns">
+                <tr>
+                    <th>Ingredient</th>
+                    <th>Amount</th>
+                    <th>Stage</th>
+                    <th>Mins</th>
+                    <th>Reason</th>
+                </tr>
+
+                <tr ng-repeat="hop in recipe.hops">
+                    <td>
+                        <input type="text" ng-model="misc.name">
+                    </td>
+                    <td>
+                        <input type="text" ng-model="misc.amount">
+                    </td>
+                    <td>
+                        <input type="text" ng-model="misc.stage">
+                    </td>
+                    <td>
+                        <input type="text" ng-model="misc.mins">
+                    </td>
+                    <td>
+                        <input type="text" ng-model="misc.reason">
+                    </td>
+
+                    <td>
+                        <button ng-click="deleteMisc()" class="button">
+                            Remove Misc
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <button ng-click="insertMisc()" class="button">
+            Add Misc
+        </button>
+    </div>
 
 	<button ng-click="updateRecipe()" class="button">
 		Save Recipe

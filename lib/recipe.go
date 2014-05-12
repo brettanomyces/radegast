@@ -9,6 +9,7 @@ import (
 type Recipe struct {
 	Id        bson.ObjectId `bson:"_id" json:"id, omitempty"`
 	Name      string		`json:"name"`
+	BatchSize int `json:"batchSize"`
 	Created   time.Time `json:"created"`
 	Style     string `json:"style"`
 	Og		  float64		`json:"og,string"`
