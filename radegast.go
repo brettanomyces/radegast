@@ -1,59 +1,42 @@
 package main
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"time"
 
 	"log"
 
 	"labix.org/v2/mgo"
-	"labix.org/v2/mgo/bson"
 
+	"github.com/brettanomyces/radegast/recipe"
 	"github.com/gorilla/mux"
-
-	"github.com/brettanomyces/radegast/lib"
-)
-
-var (
-	session    *mgo.Session
-	collection *mgo.Collection
 )
 
 func main() {
 
-	var err error
-
-	log.Println("Starting Server")
-
-	r := mux.NewRouter()
-	// API URLs
-	r.HandleFunc("/api/recipes/{id:[0-9a-z]{24}}", RetrieveRecipeHandler).Methods("GET")
-	r.HandleFunc("/api/recipes/{id:[0-9a-z]{24}}", UpdateRecipeHandler).Methods("PUT")
-	r.HandleFunc("/api/recipes/{id:[0-9a-z]{24}}", DeleteRecipeHandler).Methods("DELETE")
-	r.HandleFunc("/api/recipes", CreateRecipeHandler).Methods("POST")
-	r.HandleFunc("/api/recipes", RetrieveRecipeListHandler).Methods("GET")
-
-	// WebApp URLs
-	r.HandleFunc("/recipes/{id:[0-9a-z]{24}}", AppHandler).Methods("GET")
-
-	// Resources
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("static/")))
-
-	http.Handle("/", r)
-
-	log.Println("Starting mongo db session")
 	// MongoDB
-	session, err = mgo.Dial("localhost")
+	session, err := mgo.Dial("localhost")
 	if err != nil {
 		panic(err)
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	collection = session.DB("radegast").C("recipes")
 
-	log.Println("Listening on 8080")
+	router := mux.NewRouter()
+	// API URLs
+	recipe.SetupHandlers(session.Copy(), router)
+	// grain.setupHandlers(session.Copy(), &router)
+
+	// WebApp URLs
+	router.HandleFunc("/recipes/{id:[0-9a-z]{24}}", AppHandler).Methods("GET")
+
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("static/")))
+
+	http.Handle("/", router)
+	// Static Resources
+	//fileServer := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
+	//http.Handle("/", fileServer)
+
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -67,110 +50,4 @@ func AppHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
 		w.Write(index)
 	}
-}
-
-func CreateRecipeHandler(w http.ResponseWriter, r *http.Request) {
-	var recipe lib.Recipe
-
-	err := json.NewDecoder(r.Body).Decode(&recipe)
-	if err != nil {
-		panic(err)
-	}
-
-	recipe.Id = bson.NewObjectId()
-	recipe.Name = "test"
-	recipe.Created = time.Now()
-
-	err = collection.Insert(&recipe)
-	if err != nil {
-		panic(err)
-	} else {
-		log.Printf("Inserted new recipe %s with name %s", recipe.Id, recipe.Name)
-	}
-
-	j, err := json.Marshal(recipe)
-	if err != nil {
-		panic(err)
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(j)
-}
-
-func RetrieveRecipeHandler(w http.ResponseWriter, r *http.Request) {
-
-	vars := mux.Vars(r)
-	if bson.IsObjectIdHex(vars["id"]) {
-		var result lib.Recipe
-		id := bson.ObjectIdHex(vars["id"])
-		err := collection.Find(bson.M{"_id": id}).One(&result)
-		if err != nil {
-			panic(err)
-		}
-
-		j, err := json.Marshal(result)
-		if err != nil {
-			panic(err)
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(j)
-	} else {
-		w.WriteHeader(http.StatusNoContent)
-	}
-}
-
-func RetrieveRecipeListHandler(w http.ResponseWriter, r *http.Request) {
-	var recipes []lib.Recipe
-
-	iter := collection.Find(nil).Iter()
-	result := lib.Recipe{}
-	for iter.Next(&result) {
-		recipes = append(recipes, result)
-	}
-
-	j, err := json.Marshal(lib.Recipes{Recipes: recipes})
-	if err != nil {
-		panic(err)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(j)
-	log.Println("provided json")
-}
-
-func UpdateRecipeHandler(w http.ResponseWriter, r *http.Request) {
-	var err error
-	// Gran the recipe id from the incoming url
-	vars := mux.Vars(r)
-	id := bson.ObjectIdHex(vars["id"])
-
-	// Decode the indoming recipe json
-	var recipe lib.Recipe
-	err = json.NewDecoder(r.Body).Decode(&recipe)
-	if err != nil {
-		log.Printf("Failed to decode request body for recipe %s", id)
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-
-	err = collection.Update(bson.M{"_id": id}, recipe)
-	if err == nil {
-		log.Printf("Updated recipe: %s %s", id, recipe.Name)
-	} else {
-		log.Printf("Failed to updated collection for recipe %s", id)
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-	w.WriteHeader(http.StatusNoContent)
-}
-
-func DeleteRecipeHandler(w http.ResponseWriter, r *http.Request) {
-	// Gran the recipe's id from the incoming url
-	var err error
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	// Remove it from database
-	err = collection.Remove(bson.M{"_id": bson.ObjectIdHex(id)})
-	if err != nil {
-		log.Printf("Could not find recipe %s to delete", id)
-	}
-	w.WriteHeader(http.StatusNoContent)
 }

@@ -1,4 +1,4 @@
-package lib
+package grain
 
 type Grain struct {
 	Name  string `json:"name"`

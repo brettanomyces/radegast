@@ -1,0 +1,15 @@
+<div>
+    <h1>
+        Recipes
+    </h1>
+    <h3>
+        Your Recipes
+    </h3>
+    <hr>
+    <div  ng-repeat="recipe in recipes">
+        <h5>
+            <a href="#/recipes/{{recipe.id}}" class="text-center">{{recipe.name}}</a>
+        </h5>
+        <hr>
+    </div>
+</div>
