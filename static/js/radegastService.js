@@ -66,15 +66,15 @@ radegastApp.factory('recipeFactory', ['$http', function($http) {
 
     };
 
-    recipeFactory.insertRecipe = function(id) {
+    recipeFactory.postRecipe = function() {
         return $http({
             method: 'POST',
-            url: 'http://localhost:8080/api/recipes/' + id
+            url: 'http://localhost:8080/api/recipes'
         });
 
     };
 
-    recipeFactory.updateRecipe = function(id, data) {
+    recipeFactory.putRecipe = function(id, data) {
         return $http({
             method: 'PUT',
             url: 'http://localhost:8080/api/recipes/' + id,

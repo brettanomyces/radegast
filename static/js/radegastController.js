@@ -1,7 +1,7 @@
 'use strict';
 
-radegastApp.controller('RecipeListCtrl', ['$scope', '$routeParams', 'recipeFactory',
-	function ($scope, $routeParams, recipeFactory) {
+radegastApp.controller('RecipeListCtrl', ['$scope', '$location', '$routeParams', 'recipeFactory',
+	function ($scope, $location, $routeParams, recipeFactory) {
 
         $scope.recipes = [];
 
@@ -10,7 +10,17 @@ radegastApp.controller('RecipeListCtrl', ['$scope', '$routeParams', 'recipeFacto
         function getRecipes() {
             recipeFactory.getRecipes()
                 .success(function (data) {
-                    $scope.recipes = data.recipes;
+                    $scope.recipes = data;
+                })
+                .error(function (data) {
+                    // Do Something
+                });
+        }
+
+         $scope.postRecipe = function() {
+            recipeFactory.postRecipe()
+                .success(function (data) {
+                    $location.path('/recipes/' + data._id);
                 })
                 .error(function (data) {
                     // Do Something
