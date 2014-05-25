@@ -32,23 +32,27 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string), resource s
 	}
 }
 
-func postHandler(w http.ResponseWriter, r *http.Request, resource string) {
+func postHandler(w http.ResponseWriter, r *http.Request, collection string) {
 
 	// err := json.NewDecoder(r.Body).Decode(&result)
 	result := map[string]interface{}{
 		"_id": bson.NewObjectId(),
 	}
 
-	s := data.GetSession()
-	err := s.DB("radegast").C(resource).Insert(&result)
-
+	err := data.WithCollection(collection, func(c *mgo.Collection) error {
+		return c.Insert(&result)
+	})
 	if err != nil {
-		panic(err)
+		log.Println("Failed to create resource")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	j, err := json.Marshal(result)
 	if err != nil {
-		panic(err)
+		log.Println("Failed to parse DB response")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)
@@ -64,17 +68,21 @@ func getIdHandler(w http.ResponseWriter, r *http.Request, collection string) {
 			return c.Find(bson.M{"_id": id}).One(&result)
 		})
 		if err != nil {
-			panic(err)
+			log.Printf("Failed to get _id: %s \n", id)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 
 		j, err := json.Marshal(result)
 		if err != nil {
-			panic(err)
+			log.Println("Failed to parse DB response")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(j)
 	} else {
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusBadRequest)
 	}
 }
 
@@ -85,14 +93,17 @@ func getHandler(w http.ResponseWriter, r *http.Request, collection string) {
 		iter := c.Find(nil).Iter()
 		return iter.All(&result)
 	})
-
 	if err != nil {
-		panic(err)
+		log.Println("Failed to get resources")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	j, err := json.Marshal(result)
 	if err != nil {
-		panic(err)
+		log.Println("Failed to parse DB response")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -102,23 +113,26 @@ func getHandler(w http.ResponseWriter, r *http.Request, collection string) {
 
 func putHandler(w http.ResponseWriter, r *http.Request, collection string) {
 	var err error
-	// Gran the recipe id from the incoming url
-	vars := mux.Vars(r)
-	id := bson.ObjectIdHex(vars["id"])
 
-	// Decode the indoming recipe json
-	var recipe interface{}
-	err = json.NewDecoder(r.Body).Decode(&recipe)
-	// if we want to access the values: m := recipe.(map[string]interface{})
+	// Decode the indoming resource json
+	var resource interface{}
+	err = json.NewDecoder(r.Body).Decode(&resource)
+	// if we want to access the values: m := resource.(map[string]interface{})
 	if err != nil {
+		log.Println("Failed to decode request body")
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
+	vars := mux.Vars(r)
+	id := bson.ObjectIdHex(vars["_id"])
 	err = data.WithCollection(collection, func(c *mgo.Collection) error {
-		return c.Update(bson.M{"_id": id}, recipe)
+		return c.Update(bson.M{"_id": id}, resource)
 	})
 	if err != nil {
+		log.Println("Failed to update database")
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -131,8 +145,11 @@ func deleteHandler(w http.ResponseWriter, r *http.Request, collection string) {
 	err := data.WithCollection(collection, func(c *mgo.Collection) error {
 		return c.Remove(bson.M{"_id": bson.ObjectIdHex(id)})
 	})
+
 	if err != nil {
-		panic(err)
+		log.Printf("Failed to delete _id: %s \n", id)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
