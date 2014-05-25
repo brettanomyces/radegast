@@ -5,26 +5,16 @@ import (
 	"net/http"
 
 	"log"
-
-	"labix.org/v2/mgo"
-
 	"github.com/brettanomyces/radegast/recipe"
 	"github.com/gorilla/mux"
 )
 
 func main() {
 
-	// MongoDB
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-
 	router := mux.NewRouter()
+	router.StrictSlash(true)
 	// API URLs
-	recipe.SetupHandlers(session.Copy(), router)
+	recipe.SetupHandlers(router, "recipes")
 	// grain.setupHandlers(session.Copy(), &router)
 
 	// WebApp URLs

@@ -10,32 +10,38 @@ import (
 
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
+
+	"github.com/brettanomyces/radegast/data"
 )
 
-var (
-	session    *mgo.Session
-	collection *mgo.Collection
-)
+func SetupHandlers(r *mux.Router, resource string) {
 
-func SetupHandlers(s *mgo.Session, r *mux.Router) {
-	session = s
-	collection = session.DB("radegast").C("recipes")
-
-	r.HandleFunc("/api/recipes/{id:[0-9a-z]{24}}", GetResource).Methods("GET")
-	r.HandleFunc("/api/recipes/{id:[0-9a-z]{24}}", PutResource).Methods("PUT")
-	r.HandleFunc("/api/recipes/{id:[0-9a-z]{24}}", DeleteResource).Methods("DELETE")
-	r.HandleFunc("/api/recipes", PostResource).Methods("POST")
-	r.HandleFunc("/api/recipes", GetResources).Methods("GET")
+	r.HandleFunc("/api/"+resource+"/{id}", makeHandler(getIdHandler, resource)).Methods("GET")
+	r.HandleFunc("/api/"+resource, makeHandler(getHandler, resource)).Methods("GET")
+	r.HandleFunc("/api/"+resource+"/{id}", makeHandler(putHandler, resource)).Methods("PUT")
+	r.HandleFunc("/api/"+resource+"/{id}", makeHandler(deleteHandler, resource)).Methods("DELETE")
+	r.HandleFunc("/api/"+resource, makeHandler(postHandler, resource)).Methods("POST")
 }
 
-func PostResource(w http.ResponseWriter, r *http.Request) {
+func makeHandler(fn func(http.ResponseWriter, *http.Request, string), resource string) http.HandlerFunc {
+
+	// closure so each handler has its own resource string
+	return func(w http.ResponseWriter, r *http.Request) {
+		// some validation can be put here
+		fn(w, r, resource)
+	}
+}
+
+func postHandler(w http.ResponseWriter, r *http.Request, resource string) {
 
 	// err := json.NewDecoder(r.Body).Decode(&result)
 	result := map[string]interface{}{
 		"_id": bson.NewObjectId(),
 	}
 
-	err := collection.Insert(&result)
+	s := data.GetSession()
+	err := s.DB("radegast").C(resource).Insert(&result)
+
 	if err != nil {
 		panic(err)
 	}
@@ -48,13 +54,15 @@ func PostResource(w http.ResponseWriter, r *http.Request) {
 	w.Write(j)
 }
 
-func GetResource(w http.ResponseWriter, r *http.Request) {
+func getIdHandler(w http.ResponseWriter, r *http.Request, collection string) {
 
 	vars := mux.Vars(r)
 	if bson.IsObjectIdHex(vars["id"]) {
 		var result interface{}
 		id := bson.ObjectIdHex(vars["id"])
-		err := collection.Find(bson.M{"_id": id}).One(&result)
+		err := data.WithCollection(collection, func(c *mgo.Collection) error {
+			return c.Find(bson.M{"_id": id}).One(&result)
+		})
 		if err != nil {
 			panic(err)
 		}
@@ -70,11 +78,14 @@ func GetResource(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetResources(w http.ResponseWriter, r *http.Request) {
+func getHandler(w http.ResponseWriter, r *http.Request, collection string) {
 	var result []interface{}
 
-	iter := collection.Find(nil).Iter()
-	err := iter.All(&result)
+	err := data.WithCollection(collection, func(c *mgo.Collection) error {
+		iter := c.Find(nil).Iter()
+		return iter.All(&result)
+	})
+
 	if err != nil {
 		panic(err)
 	}
@@ -89,7 +100,7 @@ func GetResources(w http.ResponseWriter, r *http.Request) {
 	log.Println("provided json")
 }
 
-func PutResource(w http.ResponseWriter, r *http.Request) {
+func putHandler(w http.ResponseWriter, r *http.Request, collection string) {
 	var err error
 	// Gran the recipe id from the incoming url
 	vars := mux.Vars(r)
@@ -103,19 +114,23 @@ func PutResource(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	err = collection.Update(bson.M{"_id": id}, recipe)
+	err = data.WithCollection(collection, func(c *mgo.Collection) error {
+		return c.Update(bson.M{"_id": id}, recipe)
+	})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func DeleteResource(w http.ResponseWriter, r *http.Request) {
+func deleteHandler(w http.ResponseWriter, r *http.Request, collection string) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
 	// Remove it from database
-	err := collection.Remove(bson.M{"_id": bson.ObjectIdHex(id)})
+	err := data.WithCollection(collection, func(c *mgo.Collection) error {
+		return c.Remove(bson.M{"_id": bson.ObjectIdHex(id)})
+	})
 	if err != nil {
 		panic(err)
 	}
