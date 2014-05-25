@@ -63,8 +63,8 @@ radegastApp.controller('RecipeItemCtrl', ['$scope', '$routeParams', 'recipeFacto
                 });
         }
 
-        $scope.updateRecipe = function(){
-            recipeFactory.updateRecipe($routeParams.id, $scope.recipe);
+        $scope.putRecipe = function(){
+            recipeFactory.putRecipe($routeParams.id, $scope.recipe);
         };
 
         $scope.insertGrain = function() {

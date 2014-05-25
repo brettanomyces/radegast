@@ -51,21 +51,8 @@ radegastApp.factory('recipeFactory', ['$http', function($http) {
 
     var recipeFactory = {};
 
-    recipeFactory.getRecipes = function () {
-        return $http({
-            method: 'GET',
-            url: 'http://localhost:8080/api/recipes'
-        });
-    };
 
-    recipeFactory.getRecipe = function(id) {
-        return $http({
-            method: 'GET',
-            url: 'http://localhost:8080/api/recipes/' + id
-        });
-
-    };
-
+    // create 
     recipeFactory.postRecipe = function() {
         return $http({
             method: 'POST',
@@ -74,6 +61,24 @@ radegastApp.factory('recipeFactory', ['$http', function($http) {
 
     };
 
+    // retrieve
+    recipeFactory.getRecipes = function () {
+        return $http({
+            method: 'GET',
+            url: 'http://localhost:8080/api/recipes'
+        });
+    };
+
+    // retrieve
+    recipeFactory.getRecipe = function(id) {
+        return $http({
+            method: 'GET',
+            url: 'http://localhost:8080/api/recipes/' + id
+        });
+
+    };
+
+    // update
     recipeFactory.putRecipe = function(id, data) {
         return $http({
             method: 'PUT',
@@ -83,6 +88,7 @@ radegastApp.factory('recipeFactory', ['$http', function($http) {
 
     };
 
+    // delete
     recipeFactory.deleteRecipe = function(id) {
         return $http({
             method: 'DELETE',
