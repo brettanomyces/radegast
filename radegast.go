@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"log"
-	"github.com/brettanomyces/radegast/recipe"
+
 	"github.com/gorilla/mux"
 )
 
@@ -14,7 +14,7 @@ func main() {
 	router := mux.NewRouter()
 	router.StrictSlash(true)
 	// API URLs
-	recipe.SetupHandlers(router, "recipes")
+	SetupHandlers(router, "recipes")
 	// grain.setupHandlers(session.Copy(), &router)
 
 	// WebApp URLs
